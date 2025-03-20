@@ -43,6 +43,14 @@ networks: {
     url: "https://84532.rpc.thirdweb.com",
     accounts: [deployerPrivateKey],
   }
-}
+},
+etherscan: {
+  apiKey: `${etherscanApiKey}`,
+},
+verify: {
+  etherscan: {
+    apiKey: `${etherscanApiKey}`,
+  },
+},
 
 };
