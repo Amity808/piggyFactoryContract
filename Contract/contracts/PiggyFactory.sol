@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 import "./Piggy.sol";
+import "./GiftCard.sol";
 pragma solidity 0.8.28;
 
 
@@ -17,6 +18,8 @@ contract PiggyFactory {
 
 
     mapping (uint => address) public piggyDeploy;
+    mapping (uint => address) public GiftCardDeploy;
+
 
     modifier getDeploymentCount(uint256 index) {
         if (index > deploymentCount) revert Invalid_Index();
@@ -29,6 +32,7 @@ contract PiggyFactory {
     }
 
     event PiggyDeployed(address indexed piggy, address indexed owner, string purpose);
+    
 
     constructor() {
         admin = msg.sender;
@@ -53,6 +57,8 @@ contract PiggyFactory {
 
         emit PiggyDeployed(piggy, msg.sender, purpose);
     }
+
+
 
     function addToken(uint256 index, address token) public getDeploymentCount(index) onlyAdmin {
         address currentIndex = piggyDeploy[index];
