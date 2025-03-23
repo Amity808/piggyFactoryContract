@@ -42,7 +42,12 @@ networks: {
   basetestnet: {
     url: "https://84532.rpc.thirdweb.com",
     accounts: [deployerPrivateKey],
+  }, 
+  eduChain: {
+    url: "https://rpc.open-campus-codex.gelato.digital",
+    accounts: [deployerPrivateKey],
   }
+  // https://rpc.open-campus-codex.gelato.digital
 },
 etherscan: {
   apiKey: `${etherscanApiKey}`,

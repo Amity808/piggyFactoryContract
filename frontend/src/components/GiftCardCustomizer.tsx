@@ -3,6 +3,17 @@ import { Check, ChevronDown, Circle, CreditCard, Gift, Palette, User, Wallet } f
 import Button from './Button';
 import { cn } from '@/lib/utils';
 import { toast } from "@/components/ui/use-toast";
+import { useAccount, useWriteContract, useSimulateContract, useReadContract } from 'wagmi';
+import { useCryptContext } from '@/context/CryptContext'
+import { USDC, Factory } from '@/constant';
+import GiftAbi from "@/contract/GiftAbi.json";
+import FactoryAbi from "@/contract/Factory.json";
+import { ethers } from 'ethers';
+import { tokenAbi } from '@/contract/token';
+import { giftHumman } from '@/contract/human';
+import useDeployNewGift from '@/hooks/useDeployNewGift';
+
+
 
 interface GiftCardCustomizerProps {
   onUpdate: (data: {
@@ -16,19 +27,54 @@ interface GiftCardCustomizerProps {
 
 const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
   const [recipient, setRecipient] = useState('');
-  const [amount, setAmount] = useState(0.01);
+  const [amount, setAmount] = useState(1);
   const [currency, setCurrency] = useState('ETH');
   const [message, setMessage] = useState('');
-  const [theme, setTheme] = useState<'blue' | 'purple' | 'green'  | 'gold'>('blue');
+  const [mailAddress, setMailAddress] = useState('')
+  const [theme, setTheme] = useState<'blue' | 'purple' | 'green' | 'gold'>('blue');
   const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
+
+  // const { userCreatedAddress } = useCryptContext();
+  // console.log(userCreatedAddress)
+
+  const { address } = useAccount();
+
+  const { data: userCreatedAddres } = useReadContract({
+    abi: FactoryAbi,
+    address: Factory,
+    functionName: "GiftCardDeploy",
+    args: [address],
+
+  })
+  console.log(userCreatedAddres, "userCreatedAddres")
+
+  const { handleCreateContract, isLoading} = useDeployNewGift({ userContractAddress: userCreatedAddres as `0x${string}`, 
+    recipient, amount, tokenAddress: USDC, mail: mailAddress })
+  const { writeContractAsync, writeContract } = useWriteContract()
+
+  const { data: simulateGift, error } = useSimulateContract({
+    abi: GiftAbi,
+    address: userCreatedAddres as `0x${string}`,
+    functionName: "createGiftcard",
+    args: [recipient as `0x${string}`, ethers.parseEther(amount.toString()), USDC, 'mailAddress'],
+  })
+
+  const { data: simulateApproval, error: errorApproval } = useSimulateContract({
+    abi: tokenAbi,
+    address: USDC,
+    functionName: 'approve',
+    args: [userCreatedAddres, ethers.parseEther(amount.toString())],
+  })
+  console.log(error)
+
   const currencies = [
     { id: 'BTC', name: 'Bitcoin', min: 0.001, max: 1 },
     { id: 'ETH', name: 'Ethereum', min: 0.01, max: 10 },
     { id: 'USDT', name: 'Tether', min: 10, max: 1000 },
   ];
-  
+
   const handleInputChange = (field: string, value: string | number) => {
     switch (field) {
       case 'recipient':
@@ -48,7 +94,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
         setTheme(value as 'blue' | 'purple' | 'green' | 'gold');
         break;
     }
-    
+
     onUpdate({
       recipient: field === 'recipient' ? value as string : recipient,
       amount: field === 'amount' ? Number(value) : amount,
@@ -57,51 +103,59 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
       theme: field === 'theme' ? value as 'blue' | 'purple' | 'green' | 'gold' : theme,
     });
   };
-  
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSupport = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validation
-    if (!recipient) {
+    try {
+      await handleCreateContract()
+    } catch (err: any) {
+      console.log(err)
+    }
+   
+  }
+  console.log(isLoading)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      if (!recipient) {
+        toast({
+          title: "Recipient name required",
+          description: "Please enter the recipient's name",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setIsSubmitting(true);
+      // const approval = writeContractAsync(simulateApproval!.request)
+      // const result = await writeContractAsync(simulateGift!.request)
+      const result = await writeContract({
+        abi: GiftAbi,
+        address: userCreatedAddres as `0x${string}`,
+        functionName: "createGiftcard",
+        args: [recipient as `0x${string}`, ethers.parseEther(amount.toString()), USDC, 'mailAddress'],
+      })
+      console.log(result);
+
+    } catch (error) {
+      console.error("Gift card creation failed:", error);
       toast({
-        title: "Recipient name required",
-        description: "Please enter the recipient's name",
+        title: "Gift card creation failed",
+        description: "Please check the recipient address and your balance",
         variant: "destructive",
       });
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    // Change theme to gold
-    handleInputChange('theme', 'gold');
-    
-    // Simulate API call
-    setTimeout(() => {
+    } finally {
       setIsSubmitting(false);
-      
-      toast({
-        title: "Gift Card Created",
-        description: `Gift card for ${recipient} has been created!`,
-      });
-      
-      // In a real app, you might redirect to a success page or dashboard
-      // This could include a link with a unique ID to claim the gift
-      console.log({
-        recipient,
-        amount,
-        currency,
-        message,
-        theme: 'gold', // The card is now gold
-      });
-    }, 1500);
+    }
   };
-  
+
   const selectedCurrency = currencies.find(c => c.id === currency);
-  
+
   return (
     <div className="w-full max-w-md">
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSupport} className="space-y-6">
         <div className="space-y-2">
           <label htmlFor="recipient" className="block text-sm font-medium text-crypto-dark">
             Recipient Name
@@ -116,11 +170,11 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
               value={recipient}
               onChange={(e) => handleInputChange('recipient', e.target.value)}
               className="block w-full pl-10 rounded-lg border-gray-300 shadow-sm focus:border-crypto-blue focus:ring-crypto-blue input-focus-ring py-2 border"
-              placeholder="Enter recipient's name"
+              placeholder="Enter recipient's address"
             />
           </div>
         </div>
-        
+
         <div className="space-y-2">
           <label className="block text-sm font-medium text-crypto-dark">
             Amount
@@ -141,7 +195,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
                 placeholder="Enter amount"
               />
             </div>
-            
+
             <div className="relative z-20">
               <button
                 type="button"
@@ -151,7 +205,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
                 <span className="font-medium">{currency}</span>
                 <ChevronDown className={cn("h-4 w-4 transition-transform", currencyDropdownOpen ? "rotate-180" : "")} />
               </button>
-              
+
               {currencyDropdownOpen && (
                 <div className="absolute right-0 mt-1 w-36 rounded-lg bg-white shadow-lg p-1 z-30 animate-fade-in">
                   {currencies.map((c) => (
@@ -176,7 +230,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
             Min: {selectedCurrency?.min || 0} {currency} | Max: {selectedCurrency?.max || 100} {currency}
           </p>
         </div>
-        
+
         <div className="space-y-2">
           <label htmlFor="message" className="block text-sm font-medium text-crypto-dark">
             Personal Message
@@ -192,7 +246,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
           />
           <p className="text-xs text-right text-crypto-gray">{message.length}/100</p>
         </div>
-        
+
         <div className="space-y-2">
           <label className="block text-sm font-medium text-crypto-dark flex items-center">
             <Palette className="h-4 w-4 mr-1" /> Choose Card Theme
@@ -219,7 +273,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
             ))}
           </div>
         </div>
-        
+
         <Button
           type="submit"
           fullWidth

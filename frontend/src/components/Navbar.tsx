@@ -4,11 +4,16 @@ import Link from 'next/link';
 import { Menu, X, ChevronDown, Gift, Wallet, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useAccount, useDisconnect } from 'wagmi'
+
+import WalletConnect from './Wallet';
+import Disconnect from './DisConnect';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const { address, isConnected} = useAccount()
+  const { disconnect } = useDisconnect();
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 20) {
@@ -77,12 +82,10 @@ const Navbar = () => {
                 Dashboard
               </Button>
             </Link>
-            <Button 
-            //size="sm" 
-            className="gap-2  bg-[#0FA0CE] hover:bg-[#0FA0CE]/50">
-              <Wallet className="h-4 w-4 " />
-              Get Started
-            </Button>
+            {
+              address ? <Disconnect /> : <WalletConnect />
+            }
+          
           </div>
 
           {/* Mobile menu button */}
@@ -124,14 +127,13 @@ const Navbar = () => {
             Dashboard
           </Link>
           <div className="pt-2 flex flex-col space-y-2">
-            <Button  className="w-full gap-2 bg-[#0FA0CE] hover:bg-[#0FA0CE]/50">
+            {/* <Button  className="w-full gap-2 bg-[#0FA0CE] hover:bg-[#0FA0CE]/50">
               <User className="h-4 w-4" />
               Sign In
-            </Button>
-            <Button className="w-full gap-2 bg-[#0FA0CE] hover:bg-[#0FA0CE]/50">
-              <Wallet className="h-4 w-4" />
-              Get Started
-            </Button>
+            </Button> */}
+             {
+              address ? <Disconnect /> : <WalletConnect />
+            }
           </div>
         </div>
       </div>

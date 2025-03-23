@@ -4,7 +4,7 @@ interface ArrayInputProps {
   onChange: (values: string[]) => void;
   placeholder?: string;
 }
-const RandomGift = ({ onChange, placeholder =" Enter address"}: ArrayInputProps) => {
+const RandomGift = ({ onChange, placeholder ="Wallet Addresss"}: ArrayInputProps) => {
     const [inputValue, setInputValue] = useState('');
     const [values, setValues] = useState<string[]>([]);
   
@@ -31,7 +31,7 @@ const RandomGift = ({ onChange, placeholder =" Enter address"}: ArrayInputProps)
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="w-full rounded-lg border-gray-300 shadow-sm focus:border-crypto-blue focus:ring-crypto-blue input-focus-ring py-2 border"
+          className="block w-full pl-10 rounded-lg border-gray-300 shadow-sm focus:border-crypto-blue focus:ring-crypto-blue input-focus-ring py-2 border"
         />
         
         <div className="flex flex-wrap gap-2">
