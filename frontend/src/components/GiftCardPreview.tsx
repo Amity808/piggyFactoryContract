@@ -1,6 +1,7 @@
 import React from 'react';
 import { Bitcoin, Gift, Wallet } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { shortenAddress } from '@/utils';
 
 interface GiftCardPreviewProps {
   recipient: string;
@@ -59,7 +60,7 @@ const GiftCardPreview = ({ recipient, amount, currency, message, theme }: GiftCa
               <Gift className="h-6 w-6 mr-2" />
               <h3 className="text-lg font-semibold">Crypto Gift</h3>
             </div>
-            <p className="text-sm opacity-80 mt-1">For: {recipient || 'Recipient'}</p>
+            <p className="text-sm opacity-80 mt-1">For: {shortenAddress(recipient) || 'Recipient'}</p>
           </div>
           <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1.5 flex items-center">
             {getCurrencyIcon()}

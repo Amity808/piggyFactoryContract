@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
-import { Check, ChevronDown, Circle, CreditCard, Gift, Palette, User, Wallet } from 'lucide-react';
+import { Check, ChevronDown, CreditCard, Gift, Palette, User } from 'lucide-react';
 import Button from './Button';
 import { cn } from '@/lib/utils';
 import { toast } from "@/components/ui/use-toast";
 import { useAccount, useWriteContract, useSimulateContract, useReadContract } from 'wagmi';
-import { useCryptContext } from '@/context/CryptContext'
 import { USDC, Factory } from '@/constant';
-import GiftAbi from "@/contract/GiftAbi.json";
 import FactoryAbi from "@/contract/Factory.json";
 import { ethers } from 'ethers';
 import { tokenAbi } from '@/contract/token';
-import { giftHumman } from '@/contract/human';
 import useDeployNewGift from '@/hooks/useDeployNewGift';
+import {  ErrorDecoder } from 'ethers-decode-error'
+import type { DecodedError } from 'ethers-decode-error'
+// import SendGiftMail from '@/email/Welcome';
+
+
+const errorDecoder = ErrorDecoder.create()
 
 
 
@@ -21,6 +24,7 @@ interface GiftCardCustomizerProps {
     amount: number;
     currency: string;
     message: string;
+    mailAddress: string;
     theme: 'blue' | 'purple' | 'green' | 'gold';
   }) => void;
 }
@@ -36,8 +40,6 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
 
-  // const { userCreatedAddress } = useCryptContext();
-  // console.log(userCreatedAddress)
 
   const { address } = useAccount();
 
@@ -48,18 +50,27 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
     args: [address],
 
   })
-  console.log(userCreatedAddres, "userCreatedAddres")
 
-  const { handleCreateContract, isLoading} = useDeployNewGift({ userContractAddress: userCreatedAddres as `0x${string}`, 
-    recipient, amount, tokenAddress: USDC, mail: mailAddress })
+  const { data: userReadAllowance } = useReadContract({
+    abi: tokenAbi,
+    address: USDC,
+    functionName: "allowance",
+    args: [address, userCreatedAddres],
+
+  })
+
+  const { handleCreateContract } = useDeployNewGift({
+    userContractAddress: userCreatedAddres as `0x${string}`,
+    recipient, amount, tokenAddress: USDC, mail: 'mailAddress'
+  })
   const { writeContractAsync, writeContract } = useWriteContract()
 
-  const { data: simulateGift, error } = useSimulateContract({
-    abi: GiftAbi,
-    address: userCreatedAddres as `0x${string}`,
-    functionName: "createGiftcard",
-    args: [recipient as `0x${string}`, ethers.parseEther(amount.toString()), USDC, 'mailAddress'],
-  })
+  // const { data: simulateGift, error } = useSimulateContract({
+  //   abi: GiftAbi,
+  //   address: userCreatedAddres as `0x${string}`,
+  //   functionName: "createGiftcard",
+  //   args: [recipient as `0x${string}`, ethers.parseEther(amount.toString()), USDC, 'mailAddress'],
+  // })
 
   const { data: simulateApproval, error: errorApproval } = useSimulateContract({
     abi: tokenAbi,
@@ -67,12 +78,12 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
     functionName: 'approve',
     args: [userCreatedAddres, ethers.parseEther(amount.toString())],
   })
-  console.log(error)
+  console.log(errorApproval)
 
   const currencies = [
-    { id: 'BTC', name: 'Bitcoin', min: 0.001, max: 1 },
-    { id: 'ETH', name: 'Ethereum', min: 0.01, max: 10 },
-    { id: 'USDT', name: 'Tether', min: 10, max: 1000 },
+    { id: 'BTC', name: 'EDU', min: 0.001, max: 1 },
+    { id: 'ETH', name: 'UDC', min: 0.01, max: 10 },
+    { id: 'USDT', name: 'USDT', min: 10, max: 1000 },
   ];
 
   const handleInputChange = (field: string, value: string | number) => {
@@ -90,6 +101,9 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
       case 'message':
         setMessage(value as string);
         break;
+      case 'mailAddress':
+        setMailAddress(value as string);
+        break;
       case 'theme':
         setTheme(value as 'blue' | 'purple' | 'green' | 'gold');
         break;
@@ -100,20 +114,12 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
       amount: field === 'amount' ? Number(value) : amount,
       currency: field === 'currency' ? value as string : currency,
       message: field === 'message' ? value as string : message,
+      mailAddress: field === 'mailAddress' ? value as string : mailAddress,
       theme: field === 'theme' ? value as 'blue' | 'purple' | 'green' | 'gold' : theme,
     });
   };
 
-  const handleSupport = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await handleCreateContract()
-    } catch (err: any) {
-      console.log(err)
-    }
-   
-  }
-  console.log(isLoading)
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,18 +135,30 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
       }
 
       setIsSubmitting(true);
-      // const approval = writeContractAsync(simulateApproval!.request)
-      // const result = await writeContractAsync(simulateGift!.request)
-      const result = await writeContract({
-        abi: GiftAbi,
-        address: userCreatedAddres as `0x${string}`,
-        functionName: "createGiftcard",
-        args: [recipient as `0x${string}`, ethers.parseEther(amount.toString()), USDC, 'mailAddress'],
-      })
-      console.log(result);
+
+      if(Number(userReadAllowance) >= amount) {
+        await handleCreateContract()
+      } else {
+        await writeContractAsync(simulateApproval!.request);
+        await handleCreateContract();
+      }
+
+      
+      // console.log(result);
 
     } catch (error) {
       console.error("Gift card creation failed:", error);
+      const decodedError: DecodedError = await errorDecoder.decode(error)
+      console.log(`Revert reason: ${decodedError.reason}`)
+
+      if (decodedError.reason?.includes("Cannot read properties of undefined (reading 'id')")) {
+        toast({
+          title: "Switch to Supported Network",
+          description: "UnSupported Network",
+          variant: "destructive",
+        });
+      }
+
       toast({
         title: "Gift card creation failed",
         description: "Please check the recipient address and your balance",
@@ -155,10 +173,10 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
 
   return (
     <div className="w-full max-w-md">
-      <form onSubmit={handleSupport} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
           <label htmlFor="recipient" className="block text-sm font-medium text-crypto-dark">
-            Recipient Name
+            Recipient Wallet Address
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -171,6 +189,25 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
               onChange={(e) => handleInputChange('recipient', e.target.value)}
               className="block w-full pl-10 rounded-lg border-gray-300 shadow-sm focus:border-crypto-blue focus:ring-crypto-blue input-focus-ring py-2 border"
               placeholder="Enter recipient's address"
+            />
+          </div>
+        </div>
+        {/* Mail Address */}
+        <div className="space-y-2">
+          <label htmlFor="recipient" className="block text-sm font-medium text-crypto-dark">
+            Email Address
+          </label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <User className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              id="mailAddress"
+              value={mailAddress}
+              onChange={(e) => handleInputChange('mailAddress', e.target.value)}
+              className="block w-full pl-10 rounded-lg border-gray-300 shadow-sm focus:border-crypto-blue focus:ring-crypto-blue input-focus-ring py-2 border"
+              placeholder="Enter mail address"
             />
           </div>
         </div>

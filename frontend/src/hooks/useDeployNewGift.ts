@@ -18,6 +18,7 @@ const useDeployNewGift = ({ userContractAddress, recipient, amount, tokenAddress
     const [isLoading, setIsLoading] = useState(false)
     const { address } = useAccount();
     const chainId = useChainId();
+    // console.log(chainId)
     const wagmiConfig = useConfig();
 
     const handleCreateContract = useCallback(async () => {
@@ -25,6 +26,7 @@ const useDeployNewGift = ({ userContractAddress, recipient, amount, tokenAddress
         setIsLoading(true);
         if (!address) return toast.error("Please connect your wallet");
         if (!isSupportedNetwork(chainId)) return toast.error("Unsupported network");
+        // if(!)
 
         const signer = await getEthersSigner(wagmiConfig);
 
@@ -38,16 +40,16 @@ const useDeployNewGift = ({ userContractAddress, recipient, amount, tokenAddress
                 throw new Error("Transation failed");
             }
 
-            toast.success("Account created Successfully");
+            toast.success("Gift card successfully created");
 
         } catch (error) {
             console.log(error)
-            toast.error("No reward to claim")
+            toast.error("Unable to create giftcard")
         } finally {
             setIsLoading(false)
         }
 
-    }, [address, wagmiConfig, chainId]);
+    }, [address, wagmiConfig, chainId,recipient, amount, tokenAddress, mail, userContractAddress]);
     return {
         handleCreateContract, isLoading
     }

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X, ChevronDown, Gift, Wallet, User } from 'lucide-react';
@@ -12,9 +11,12 @@ import Disconnect from './DisConnect';
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { address, isConnected} = useAccount()
-  const { disconnect } = useDisconnect();
+  const [isMounted, setIsMounted] = useState(false);
+  const { address } = useAccount();
+
+
   useEffect(() => {
+    setIsMounted(true);
     const handleScroll = () => {
       if (window.scrollY > 20) {
         setScrolled(true);
@@ -26,6 +28,8 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  if (!isMounted) return null;
 
   return (
     <nav
@@ -74,10 +78,10 @@ const Navbar = () => {
 
           <div className="hidden md:flex items-center space-x-4">
             <Link href="/dashboard">
-              <Button 
-              //variant="outline" 
-            //   size="sm" 
-              className="gap-2 bg-[#0FA0CE] hover:bg-[#0FA0CE]/50">
+              <Button
+                //variant="outline" 
+                //   size="sm" 
+                className="gap-2 bg-[#0FA0CE] hover:bg-[#0FA0CE]/50">
                 <User className="h-4 w-4" />
                 Dashboard
               </Button>
@@ -85,7 +89,7 @@ const Navbar = () => {
             {
               address ? <Disconnect /> : <WalletConnect />
             }
-          
+
           </div>
 
           {/* Mobile menu button */}
@@ -131,7 +135,7 @@ const Navbar = () => {
               <User className="h-4 w-4" />
               Sign In
             </Button> */}
-             {
+            {
               address ? <Disconnect /> : <WalletConnect />
             }
           </div>
