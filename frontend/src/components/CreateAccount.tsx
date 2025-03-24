@@ -1,7 +1,7 @@
 import React from 'react'
 import Button from './Button'
 import { User } from 'lucide-react'
-import { useAccount, useReadContract, useSimulateContract, useWriteContract } from 'wagmi'
+import { useSimulateContract, useWriteContract } from 'wagmi'
 import FactoryAbi from "@/contract/Factory.json"
 import { Factory, USDC } from '@/constant'
 // import useDeployNewGift from '@/hooks/useDeployNewGift'
@@ -28,8 +28,8 @@ const CreateAccount = () => {
     const handleWrite = async () => {
         try {
             await writeContractAsync(simulateCreate!.request)
-        } catch (error: any) {
-            toast.error(error)
+        } catch (error) {
+            toast.error(error as any)
         }
     }
 

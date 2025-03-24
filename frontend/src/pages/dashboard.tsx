@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Wallet, Grid, List, Search, Plus, Filter } from "lucide-react";
+import {  Grid, List, Search, Plus, Filter } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
@@ -9,8 +9,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
-  Tabs, 
-  TabsContent, 
+  Tabs,  
   TabsList, 
   TabsTrigger 
 } from "@/components/ui/tabs";
@@ -18,6 +17,8 @@ import {
 const Dashboard = () => {
   const [view, setView] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
+  console.log(view);
+  
 
   return (
     <div className="min-h-screen flex flex-col">

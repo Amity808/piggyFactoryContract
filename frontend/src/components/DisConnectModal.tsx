@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
     Dialog,
     DialogContent,
@@ -8,10 +8,10 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-import { ShieldAlert, ShieldCheck, ArrowUpRight } from "lucide-react";
-import { useConnectors, useAccount, useDisconnect } from "wagmi";
+import { ShieldAlert, ShieldCheck } from "lucide-react";
+import { useAccount, useDisconnect } from "wagmi";
 import { shortenAddress } from "@/utils";
-import { toast } from "sonner";
+
 
 
 // Mock data for wallet options - in a real app, these would be detected

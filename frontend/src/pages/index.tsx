@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
-import GiftCardCreator from '../components/GiftCardCreator';
+// import GiftCardCreator from '../components/GiftCardCreator';
 import FeaturesSection from '../components/FeaturesSection';
 import Footer from '../components/Footer';
 

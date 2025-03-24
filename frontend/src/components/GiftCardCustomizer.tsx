@@ -63,7 +63,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
     userContractAddress: userCreatedAddres as `0x${string}`,
     recipient, amount, tokenAddress: USDC, mail: 'mailAddress'
   })
-  const { writeContractAsync, writeContract } = useWriteContract()
+  const { writeContractAsync } = useWriteContract()
 
   // const { data: simulateGift, error } = useSimulateContract({
   //   abi: GiftAbi,

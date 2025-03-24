@@ -40,7 +40,7 @@ export function GiftCardClaimForm({ giftCard, onClaim }: GiftCardClaimFormProps)
       <CardHeader>
         <CardTitle>Claim Your Gift</CardTitle>
         <CardDescription>
-          You've received {giftCard.amount} {giftCard.currency} from {giftCard.senderName}
+          You&lsquo;ve received {giftCard.amount} {giftCard.currency} from {giftCard.senderName}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -79,7 +79,7 @@ export function GiftCardClaimForm({ giftCard, onClaim }: GiftCardClaimFormProps)
             <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
               <h4 className="font-medium text-amber-800 mb-1">Important</h4>
               <p className="text-sm text-amber-700">
-                Make sure you're using a wallet that supports {giftCard.currency}. Once claimed, the gift will be sent to your wallet immediately.
+                Make sure you&lsquo;re using a wallet that supports {giftCard.currency}. Once claimed, the gift will be sent to your wallet immediately.
               </p>
             </div>
           </div>
