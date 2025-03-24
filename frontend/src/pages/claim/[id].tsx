@@ -63,7 +63,7 @@ const ClaimGiftCard = () => {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold">Claim Your Gift Card</h1>
             <p className="text-crypto-gray mt-2">
-              You've received a crypto gift! Enter your wallet address to claim it.
+              You&apos;ve received a crypto gift! Enter your wallet address to claim it.
             </p>
           </div>
           
@@ -129,7 +129,7 @@ const ClaimGiftCard = () => {
                       </div>
                       
                       <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                        <p className="text-sm italic text-white/90">"{giftCard.message}"</p>
+                        <p className="text-sm italic text-white/90">&quot;{giftCard.message}&quot;</p>
                       </div>
                     </div>
                     

@@ -76,7 +76,7 @@ const GiftCardPreview = ({ recipient, amount, currency, message, theme }: GiftCa
           </div>
           
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
-            <p className="text-sm italic opacity-90">"{message || 'Add a personal message here...'}"</p>
+            <p className="text-sm italic opacity-90">&quot;{message || 'Add a personal message here...'}&quot;</p>
           </div>
         </div>
         

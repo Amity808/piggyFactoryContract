@@ -1,10 +1,10 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { ArrowRight, Gift, Send } from 'lucide-react';
 import Button from './Button';
 
 const HeroSection = () => {
-  const elementsRef = useRef<(HTMLElement | null)[]>([]);
+  // const elementsRef = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
     // Add observer for animations
@@ -97,7 +97,7 @@ const HeroSection = () => {
                 
                 <div className="mb-6">
                   <p className="text-sm text-crypto-gray italic">
-                    "Happy birthday, Sarah! Hope this helps you start your crypto journey. Love, Alex"
+                  &quot;Happy birthday, Sarah! Hope this helps you start your crypto journey. Love, Alex&quot;
                   </p>
                 </div>
                 

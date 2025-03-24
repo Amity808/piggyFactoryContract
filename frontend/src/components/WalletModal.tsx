@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-import { ShieldAlert, ShieldCheck, ArrowUpRight } from "lucide-react";
+import { ShieldAlert, ShieldCheck } from "lucide-react";
 import { useConnectors, useAccount } from "wagmi";
 
 import { toast } from "sonner";
@@ -28,9 +28,9 @@ const WalletModal = ({ open, onOpenChange }: WalletModalProps) => {
 
     const connectors = useConnectors();
 
-    const walletConnector = connectors.find(
-        (connector) => connector.id === "walletConnect"
-    )
+    // const walletConnector = connectors.find(
+    //     (connector) => connector.id === "walletConnect"
+    // )
 
     const otherConnectors = connectors.filter(
         (connector) => connector.id !== "walletConnect"
@@ -40,6 +40,7 @@ const WalletModal = ({ open, onOpenChange }: WalletModalProps) => {
     const { address } = useAccount()
 
     console.log(address)
+    ///
     const handleConnectWallet = async (connector: any) => {
         try {
             setPendingConnectorUID(connector?.id);

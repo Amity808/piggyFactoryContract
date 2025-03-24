@@ -96,7 +96,7 @@ contract GiftCardContract is ReentrancyGuard {
         public
         AmountISZero(amount)
         AddressZero(tokenAddress)
-        Token_Exist(tokenAddress)
+        Token_Exist(tokenAddress) returns(bytes32 cardId)
     {
         require(
             IERC20(tokenAddress).transferFrom(
@@ -106,7 +106,7 @@ contract GiftCardContract is ReentrancyGuard {
             ),
             "Tarnsfer Failed"
         );
-        bytes32 cardId = keccak256(
+        cardId = keccak256(
             abi.encodePacked(msg.sender, _recipient, block.timestamp)
         );
         _giftCard[cardId] = GiftCardStruct({
@@ -122,6 +122,7 @@ contract GiftCardContract is ReentrancyGuard {
         userGiftCards[_recipient].push(cardId);
 
         emit GiftCardCreated(cardId, msg.sender, _recipient, amount);
+        cardId;
     }
 
     function redeemGiftCard(bytes32 _cardId) external nonReentrant {

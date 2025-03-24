@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, ChevronDown, Gift, Wallet, User } from 'lucide-react';
+import { Menu, X, ChevronDown, Gift, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useAccount, useDisconnect } from 'wagmi'
+import { useAccount } from 'wagmi'
 
 import WalletConnect from './Wallet';
 import Disconnect from './DisConnect';
