@@ -29,6 +29,7 @@ const CreateAccount = () => {
         try {
             await writeContractAsync(simulateCreate!.request)
         } catch (error) {
+            /* eslint-disable @typescript-eslint/no-explicit-any */
             toast.error(error as any)
         }
     }

@@ -296,6 +296,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
               { id: 'dark', color: 'bg-gray-800' },
               { id: 'gold', color: 'bg-gradient-to-r from-amber-300 to-yellow-600' },
             ].map((colorOption) => (
+              /* eslint-disable @typescript-eslint/no-explicit-any */
               <button
                 key={colorOption.id}
                 type="button"
@@ -303,6 +304,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
                   "w-8 h-8 rounded-full flex items-center justify-center transition-transform",
                   theme === colorOption.id && "ring-2 ring-offset-2 ring-crypto-blue scale-110"
                 )}
+
                 onClick={() => handleInputChange('theme', colorOption.id as any)}
               >
                 <span className={`w-6 h-6 rounded-full ${colorOption.color}`}></span>

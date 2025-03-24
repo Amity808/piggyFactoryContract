@@ -40,7 +40,8 @@ const WalletModal = ({ open, onOpenChange }: WalletModalProps) => {
     const { address } = useAccount()
 
     console.log(address)
-    ///
+
+    /* eslint-disable @typescript-eslint/no-explicit-any */ 
     const handleConnectWallet = async (connector: any) => {
         try {
             setPendingConnectorUID(connector?.id);

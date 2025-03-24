@@ -16,6 +16,7 @@ import {
     userFirstname: string;
     address: string;
     content: string;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     link: any;
   }
   
