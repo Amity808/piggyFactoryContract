@@ -36,13 +36,13 @@ contract GiftCardContract is ReentrancyGuard {
     mapping(address => bytes32[]) public userGiftCards;
 
     event GiftCardCreated(
-        bytes32 cardId,
+        bytes32 indexed cardId,
         address indexed creator,
         address indexed recipient,
         uint256 amount
     );
     event GiftCardRedeemed(
-        bytes32 cardId,
+        bytes32 indexed cardId,
         address indexed recipient,
         uint256 amount
     );

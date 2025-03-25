@@ -16,6 +16,7 @@ interface Params {
 }
 const useDeployNewGift = ({ userContractAddress, recipient, amount, tokenAddress, mail }: Params) => {
     const [isLoading, setIsLoading] = useState(false)
+    const [cardIdE, setCardIdE] = useState('')
     const { address } = useAccount();
     const chainId = useChainId();
     // console.log(chainId)
@@ -39,9 +40,24 @@ const useDeployNewGift = ({ userContractAddress, recipient, amount, tokenAddress
             if (receipt.status === 0) {
                 throw new Error("Transation failed");
             }
+            /* eslint-disable @typescript-eslint/no-explicit-any */
+            const event = receipt.logs.find((log: any) => 
+                log.address.toLowerCase() === userContractAddress.toLowerCase()
+            );
+        
+            if (event) {
+                const parsedLog = factoryContract.interface.parseLog(event);
+                console.log("GiftCardCreated Event Data:", parsedLog?.args);
+                const cardId = parsedLog?.args.cardId;
+                console.log("Card ID:", cardId);
+                setCardIdE(cardId);
+            } else {
+                console.error("Event not found in transaction logs");
+                return null;
+            }
 
             toast.success("Gift card successfully created");
-
+            return receipt
         } catch (error) {
             console.log(error)
             toast.error("Unable to create giftcard")
@@ -49,9 +65,9 @@ const useDeployNewGift = ({ userContractAddress, recipient, amount, tokenAddress
             setIsLoading(false)
         }
 
-    }, [address, wagmiConfig, chainId,recipient, amount, tokenAddress, mail, userContractAddress]);
+    }, [address, wagmiConfig, chainId,recipient, amount, tokenAddress, mail, userContractAddress, cardIdE]);
     return {
-        handleCreateContract, isLoading
+        handleCreateContract, isLoading, cardIdE
     }
 
 

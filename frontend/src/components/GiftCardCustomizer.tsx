@@ -11,6 +11,8 @@ import { tokenAbi } from '@/contract/token';
 import useDeployNewGift from '@/hooks/useDeployNewGift';
 import {  ErrorDecoder } from 'ethers-decode-error'
 import type { DecodedError } from 'ethers-decode-error'
+import { sendEmail } from "@/utils/index"
+
 // import SendGiftMail from '@/email/Welcome';
 
 
@@ -51,6 +53,8 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
 
   })
 
+  console.log(userCreatedAddres)
+
   const { data: userReadAllowance } = useReadContract({
     abi: tokenAbi,
     address: USDC,
@@ -59,7 +63,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
 
   })
 
-  const { handleCreateContract } = useDeployNewGift({
+  const { handleCreateContract, cardIdE } = useDeployNewGift({
     userContractAddress: userCreatedAddres as `0x${string}`,
     recipient, amount, tokenAddress: USDC, mail: 'mailAddress'
   })
@@ -118,8 +122,9 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
       theme: field === 'theme' ? value as 'blue' | 'purple' | 'green' | 'gold' : theme,
     });
   };
-
   
+
+  const baseURL = `http://localhost:3000/claim/${cardIdE}`;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,10 +142,25 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
       setIsSubmitting(true);
 
       if(Number(userReadAllowance) >= amount) {
-        await handleCreateContract()
+        const result = await handleCreateContract();
+        
+        if(cardIdE) {
+          const baseURL = `http://localhost:3000/claim/${cardIdE}`;
+          const res = await sendEmail({link: baseURL, recipentName: "CrytaFath", address: address, email: mailAddress, subjectLine: message})
+          console.log('res', res)
+        }
+        console.log(result, 'result')
       } else {
         await writeContractAsync(simulateApproval!.request);
-        await handleCreateContract();
+        const result = await handleCreateContract();
+        
+        if(cardIdE) {
+          const baseURL = `http://localhost:3000/claim/${cardIdE}`;
+          const res = await sendEmail({link: baseURL, recipentName: "CrytaFath", address: address, email: mailAddress, subjectLine: message})
+          res
+        }
+
+        console.log(result, 'result')
       }
 
       

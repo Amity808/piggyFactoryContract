@@ -4,6 +4,7 @@
 // type Data = {
 //   name: string;
 // };
+import nodemailer from 'nodemailer';
 
 export default function handler(
   req,
@@ -14,7 +15,7 @@ export default function handler(
         to: req.body.reciever,
         subject: req.body.subject,
         text: req.body.text,
-        html: `<p>${req.body.message}</p>`,
+        html: req.body.message,
       };
 
       const transporter = nodemailer.createTransport({
