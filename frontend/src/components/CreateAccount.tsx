@@ -12,13 +12,13 @@ import { toast } from 'sonner'
 
 const CreateAccount = () => {
 
-    
-    
 
-    const {data: simulateCreate, error} = useSimulateContract({
+
+
+    const { data: simulateCreate, error } = useSimulateContract({
         abi: FactoryAbi,
         address: Factory,
-        functionName: "deployGift", 
+        functionName: "deployGift",
         args: [USDC],
     })
 
@@ -35,22 +35,22 @@ const CreateAccount = () => {
     }
 
     // const {handleCreateContract, isLoading} = useDeployNewGift({tokenAddress: USDC})
-  return (
-    <div>
-        {/* <Link href="/dashboard"> */}
-              <Button 
+    return (
+        <div>
+            {/* <Link href="/dashboard"> */}
+            <Button
                 onClick={() => handleWrite()}
-              className="gap-2 bg-[#0FA0CE] hover:bg-[#0FA0CE]/50">
+                className="gap-2 bg-[#0FA0CE] hover:bg-[#0FA0CE]/50">
                 <User className="h-4 w-4" />
                 Create Account
-              </Button>
-              {/* {isLoading && (
+            </Button>
+            {/* {isLoading && (
                 <LoaderIcon className="h-4 w-4 text-crypto-blue" />  
               )} */}
             {/* </Link> */}
-            
-    </div>
-  )
+
+        </div>
+    )
 }
 
 export default CreateAccount

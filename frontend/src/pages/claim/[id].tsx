@@ -13,9 +13,10 @@ const ClaimGiftCard = () => {
   const params = useParams();
   const id = params?.id as string;
     const navigate = useRouter();
-    /* eslint-disable @typescript-eslint/no-explicit-any */
+    // const { id } = navigate.query 
+        /* eslint-disable @typescript-eslint/no-explicit-any */ 
   const [giftCard, setGiftCard] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState (true);
   const [claimed, setClaimed] = useState(false);
 
   useEffect(() => {
