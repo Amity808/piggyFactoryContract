@@ -145,8 +145,8 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
         
         if(cardIdE) {
           const baseURL = `http://localhost:3000/claim/${cardIdE}`;
-          const res = await sendEmail({link: baseURL, recipentName: "CrytaFath", address: address, email: mailAddress, subjectLine: message})
-          console.log('res', res)
+          await sendEmail({link: baseURL, recipentName: "CrytaFath", address: address, email: mailAddress, subjectLine: message})
+          
         }
         console.log(result, 'result')
       } else {
@@ -155,8 +155,8 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
         
         if(cardIdE) {
           const baseURL = `http://localhost:3000/claim/${cardIdE}`;
-          const res = await sendEmail({link: baseURL, recipentName: "CrytaFath", address: address, email: mailAddress, subjectLine: message})
-          res
+           await sendEmail({link: baseURL, recipentName: "CrytaFath", address: address, email: mailAddress, subjectLine: message})
+          
         }
 
         console.log(result, 'result')
