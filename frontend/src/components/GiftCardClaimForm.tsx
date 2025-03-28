@@ -1,38 +1,67 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Check, Wallet } from "lucide-react";
-import { GiftCard } from "@/data/mockGiftCards";
-
+// import { Input } from "@/components/ui/input";
+// import { Check, Wallet } from "lucide-react";
+import { useSimulateContract, useWriteContract } from "wagmi";
+import GiftAbi from "@/contract/GiftAbi.json";
+import { toast } from "sonner";
+interface GiftCardDetails {
+  poolBalance: bigint;
+  owner: string;
+  isRedeem: boolean;
+  recipient: string;
+  mail: string;
+  token: string;
+}
 interface GiftCardClaimFormProps {
-  giftCard: GiftCard;
-  onClaim: (walletAddress: string) => void;
+  giftCard: GiftCardDetails;
+  userCreatedAddres: string;
+  cardId: string;
 }
 
-export function GiftCardClaimForm({ giftCard, onClaim }: GiftCardClaimFormProps) {
-  const [walletAddress, setWalletAddress] = useState("");
-  const [isValid, setIsValid] = useState(false);
+export function GiftCardClaimForm({giftCard, userCreatedAddres, cardId }: GiftCardClaimFormProps) {
+  // const [walletAddress, setWalletAddress] = useState("");
+  // const [isValid, setIsValid] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // const { address } = useAccount();
 
   // Simple validation function - in a real app, this would be more sophisticated
-  const validateWalletAddress = (address: string) => {
-    // This is a very simple validation - just checking if it looks like an Ethereum address
-    // In a real app, you'd want to do proper blockchain-specific validation
-    const isValidEth = /^0x[a-fA-F0-9]{40}$/.test(address);
-    setIsValid(isValidEth);
-    return isValidEth;
-  };
+  // const validateWalletAddress = (address: string) => {
+  //   // This is a very simple validation - just checking if it looks like an Ethereum address
+  //   // In a real app, you'd want to do proper blockchain-specific validation
+  //   const isValidEth = /^0x[a-fA-F0-9]{40}$/.test(address);
+  //   // setIsValid(isValidEth);
+  //   return isValidEth;
+  // };
+  const { writeContractAsync } = useWriteContract()
+  const {data: simulate} = useSimulateContract({
+    abi: GiftAbi,
+    address: userCreatedAddres as `0x${string}`,
+    functionName: "redeemGiftCard",
+    args: [cardId],
+  })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateWalletAddress(walletAddress)) {
-      return;
+    // if (!validateWalletAddress(walletAddress)) {
+    //   return;
+    // }
+    setIsSubmitting(true);
+
+    try {
+      await writeContractAsync(simulate!.request)
+      toast.success("Successfully claimed your wallet address")
+    } catch (error) {
+      // console.error(error);
+      
+    } finally {
+      setIsSubmitting(false);
     }
     
-    setIsSubmitting(true);
-    onClaim(walletAddress);
   };
 
   return (
@@ -40,7 +69,8 @@ export function GiftCardClaimForm({ giftCard, onClaim }: GiftCardClaimFormProps)
       <CardHeader>
         <CardTitle>Claim Your Gift</CardTitle>
         <CardDescription>
-          You&lsquo;ve received {giftCard.amount} {giftCard.currency} from {giftCard.senderName}
+        {/* {giftCard.currency} from {giftCard.senderName} */}
+          You&lsquo;ve received {giftCard?.poolBalance} 
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -51,7 +81,7 @@ export function GiftCardClaimForm({ giftCard, onClaim }: GiftCardClaimFormProps)
                 Your Wallet Address
               </label>
               <div className="relative">
-                <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                {/* <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
                   id="wallet-address"
                   placeholder="0x..."
@@ -61,9 +91,9 @@ export function GiftCardClaimForm({ giftCard, onClaim }: GiftCardClaimFormProps)
                     setWalletAddress(e.target.value);
                     validateWalletAddress(e.target.value);
                   }}
-                />
+                /> */}
               </div>
-              {walletAddress && !isValid && (
+              {/* {walletAddress && !isValid && (
                 <p className="text-sm text-red-500 mt-1">
                   Please enter a valid wallet address
                 </p>
@@ -73,13 +103,14 @@ export function GiftCardClaimForm({ giftCard, onClaim }: GiftCardClaimFormProps)
                   <Check className="h-4 w-4 mr-1" />
                   Valid wallet address
                 </p>
-              )}
+              )} */}
             </div>
             
             <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
               <h4 className="font-medium text-amber-800 mb-1">Important</h4>
               <p className="text-sm text-amber-700">
-                Make sure you&lsquo;re using a wallet that supports {giftCard.currency}. Once claimed, the gift will be sent to your wallet immediately.
+                {/* {giftCard.currency} */}
+                Make sure you&lsquo;re using a wallet that supports USDC. Once claimed, the gift will be sent to your wallet immediately.
               </p>
             </div>
           </div>
@@ -89,7 +120,8 @@ export function GiftCardClaimForm({ giftCard, onClaim }: GiftCardClaimFormProps)
         <Button 
           className="w-full bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600"
           onClick={handleSubmit}
-          disabled={!isValid || isSubmitting}
+          // !isValid ||
+          disabled={ isSubmitting}
         >
           {isSubmitting ? (
             <>

@@ -65,7 +65,7 @@ const useDeployNewGift = ({ userContractAddress, recipient, amount, tokenAddress
             setIsLoading(false)
         }
 
-    }, [address, wagmiConfig, chainId,recipient, amount, tokenAddress, mail, userContractAddress, cardIdE]);
+    }, [address, wagmiConfig, chainId,recipient, amount, tokenAddress, mail, userContractAddress]);
     return {
         handleCreateContract, isLoading, cardIdE
     }

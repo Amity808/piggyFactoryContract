@@ -124,7 +124,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
   };
   
 
-  const baseURL = `http://localhost:3000/claim/${cardIdE}`;
+  // const baseURL = `http://localhost:3000/claim/${cardIdE}`;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
