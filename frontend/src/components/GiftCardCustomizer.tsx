@@ -50,7 +50,6 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
     address: Factory,
     functionName: "GiftCardDeploy",
     args: [address],
-
   })
 
   console.log(userCreatedAddres)
