@@ -57,6 +57,7 @@ export function GiftCardClaimForm({giftCard, userCreatedAddres, cardId }: GiftCa
       toast.success("Successfully claimed your wallet address")
     } catch (error) {
       // console.error(error);
+      toast.error("Failed to claim your wallet address", error)
       
     } finally {
       setIsSubmitting(false);
