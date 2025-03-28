@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useSimulateContract, useWriteContract } from "wagmi";
 import GiftAbi from "@/contract/GiftAbi.json";
 import { toast } from "sonner";
+
 interface GiftCardDetails {
   poolBalance: bigint;
   owner: string;
@@ -16,11 +17,11 @@ interface GiftCardDetails {
 }
 interface GiftCardClaimFormProps {
   giftCard: GiftCardDetails;
-  userCreatedAddres: string;
+  userCreatedAddres: `0x${string}` | undefined;
   cardId: string;
 }
 
-export function GiftCardClaimForm({giftCard, userCreatedAddres, cardId }: GiftCardClaimFormProps) {
+export function GiftCardClaimForm({ giftCard, userCreatedAddres, cardId }: GiftCardClaimFormProps) {
   // const [walletAddress, setWalletAddress] = useState("");
   // const [isValid, setIsValid] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,18 +36,18 @@ export function GiftCardClaimForm({giftCard, userCreatedAddres, cardId }: GiftCa
   //   return isValidEth;
   // };
   const { writeContractAsync } = useWriteContract()
-  const {data: simulate} = useSimulateContract({
+  const { data: simulate } = useSimulateContract({
     abi: GiftAbi,
     address: userCreatedAddres as `0x${string}`,
     functionName: "redeemGiftCard",
     args: [cardId],
   })
 
-  
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // if (!validateWalletAddress(walletAddress)) {
     //   return;
     // }
@@ -55,14 +56,16 @@ export function GiftCardClaimForm({giftCard, userCreatedAddres, cardId }: GiftCa
     try {
       await writeContractAsync(simulate!.request)
       toast.success("Successfully claimed your wallet address")
+
     } catch (error) {
       // console.error(error);
+      /* eslint-disable @typescript-eslint/no-explicit-any */
       toast.error("Failed to claim your wallet address", error as any)
-      
+
     } finally {
       setIsSubmitting(false);
     }
-    
+
   };
 
   return (
@@ -70,8 +73,8 @@ export function GiftCardClaimForm({giftCard, userCreatedAddres, cardId }: GiftCa
       <CardHeader>
         <CardTitle>Claim Your Gift</CardTitle>
         <CardDescription>
-        {/* {giftCard.currency} from {giftCard.senderName} */}
-          You&lsquo;ve received {giftCard?.poolBalance} 
+          {/* {giftCard.currency} from {giftCard.senderName} */}
+          You&lsquo;ve received {giftCard?.poolBalance}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -106,7 +109,7 @@ export function GiftCardClaimForm({giftCard, userCreatedAddres, cardId }: GiftCa
                 </p>
               )} */}
             </div>
-            
+
             <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
               <h4 className="font-medium text-amber-800 mb-1">Important</h4>
               <p className="text-sm text-amber-700">
@@ -118,11 +121,11 @@ export function GiftCardClaimForm({giftCard, userCreatedAddres, cardId }: GiftCa
         </form>
       </CardContent>
       <CardFooter>
-        <Button 
+        <Button
           className="w-full bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600"
           onClick={handleSubmit}
           // !isValid ||
-          disabled={ isSubmitting}
+          disabled={isSubmitting}
         >
           {isSubmitting ? (
             <>
