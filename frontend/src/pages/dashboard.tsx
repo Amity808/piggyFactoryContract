@@ -3,7 +3,6 @@ import { useState } from "react";
 import {  Grid, List, Search, Plus, Filter } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { GiftCardGrid } from "@/components/dashboard/GiftCardGrid";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -27,7 +26,7 @@ const Dashboard = () => {
       <div className="flex-1 pt-20">
         <SidebarProvider>
           <div className="flex w-full min-h-[calc(100vh-5rem)]">
-            <DashboardSidebar />
+            {/* <DashboardSidebar /> */}
             
             <SidebarInset>
               <div className="p-6">

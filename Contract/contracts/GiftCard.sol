@@ -15,6 +15,10 @@ contract GiftCardContract is ReentrancyGuard {
     error AmountIs_Zero();
     error Already_Initialized();
 
+    enum GiftCardStatus {
+        PENDING, 
+    REDEEMED}
+
     struct GiftCardStruct {
         uint256 poolBalance;
         address owner;
@@ -22,6 +26,7 @@ contract GiftCardContract is ReentrancyGuard {
         address recipient;
         string mail;
         address token;
+        GiftCardStatus status;
     }
 
     uint256 public giftCount;
@@ -33,7 +38,7 @@ contract GiftCardContract is ReentrancyGuard {
     mapping(address => bytes32) public _giftCardSig;
     mapping(address => bool) public allowedTokens;
     mapping(address => mapping(uint256 => bytes32)) public _bytes32;
-    mapping(address => bytes32[]) public userGiftCards;
+    mapping(address => bytes32[]) private userGiftCards;
 
     event GiftCardCreated(
         bytes32 indexed cardId,
@@ -57,6 +62,12 @@ contract GiftCardContract is ReentrancyGuard {
         address indexed creator,
         uint256 amount
     );
+    
+    event FundsDistributed(
+    address indexed sender,
+    address[] recipients,
+    uint256 totalAmount
+);
 
     modifier Token_Exist(address token) {
         if (allowedTokens[token] == false) revert Token_NOTExist();
@@ -81,11 +92,7 @@ contract GiftCardContract is ReentrancyGuard {
         ownerAccount = _owner;
     }
 
-    // function initilize(address _tokenAddress) public notInitialized {
-    //     allowedTokens[_tokenAddress] = true;
-    //     ownerAccount = msg.sender; 0x3BfB66999C22c0189B0D837D12D5A4004844EC12
-    //     initialized = true; 0x9dBa18e9b96b905919cC828C399d313EfD55D800
-    // }
+  
 
     function createGiftcard(
         address _recipient,
@@ -115,11 +122,12 @@ contract GiftCardContract is ReentrancyGuard {
             isRedeem: false,
             recipient: _recipient,
             mail: _mail,
-            token: tokenAddress
+            token: tokenAddress, status: GiftCardStatus.PENDING
         });
 
         userGiftCards[msg.sender].push(cardId);
         userGiftCards[_recipient].push(cardId);
+
 
         emit GiftCardCreated(cardId, msg.sender, _recipient, amount);
         cardId;
@@ -130,7 +138,7 @@ contract GiftCardContract is ReentrancyGuard {
         if (card.isRedeem) revert Card_Already_Claimed();
         if (card.recipient != msg.sender) revert YOU_Are_Not_AUTHORIZED();
 
-        card.isRedeem = true;
+        
 
         // Get 5% of the pool balance
         uint256 amount = (card.poolBalance * 5) / 100;
@@ -139,6 +147,9 @@ contract GiftCardContract is ReentrancyGuard {
             IERC20(card.token).transferFrom(msg.sender, address(this), amount),
             "Transfer failed"
         );
+
+        card.isRedeem = true;
+        card.status = GiftCardStatus.REDEEMED;
 
         emit GiftCardRedeemed(_cardId, msg.sender, amount);
     }
@@ -217,7 +228,8 @@ contract GiftCardContract is ReentrancyGuard {
                 recipient: _recipients[i],
                 isRedeem: false,
                 mail: mail[i],
-                token: address(token)
+                token: address(token),
+                status: GiftCardStatus.PENDING
             });
             emit GiftCardCreated(
                 cardId,
@@ -227,6 +239,50 @@ contract GiftCardContract is ReentrancyGuard {
             );
         }
     }
+
+    
+    function distributeEqually(
+    address[] calldata recipients,
+    uint256 totalAmount,
+    address tokenAddress
+) external {
+    // Validate inputs
+    require(recipients.length > 0, "No recipients provided");
+    require(totalAmount > 0, "Amount must be greater than zero");
+    require(tokenAddress != address(0), "Invalid token address");
+
+    // Transfer total amount from sender to contract
+    require(
+        IERC20(tokenAddress).transferFrom(
+            msg.sender,
+            address(this),
+            totalAmount
+        ),
+        "Transfer failed"
+    );
+
+    // Calculate amount per recipient
+    uint256 amountPerRecipient = totalAmount / recipients.length;
+
+    // Distribute funds to each recipient
+    for (uint256 i = 0; i < recipients.length; i++) {
+        require(
+            IERC20(tokenAddress).transfer(recipients[i], amountPerRecipient),
+            "Transfer to recipient failed"
+        );
+    }
+
+    // If there's a remainder due to division, send it back to sender
+    // uint256 remainder = totalAmount - (amountPerRecipient * recipients.length);
+    // if (remainder > 0) {
+    //     require(
+    //         IERC20(tokenAddress).transfer(msg.sender, remainder),
+    //         "Remainder transfer failed"
+    //     );
+    // }
+
+    emit FundsDistributed(msg.sender, recipients, totalAmount);
+}
 
     //view funtions
     function getGiftCardsForAddress(
@@ -247,7 +303,8 @@ contract GiftCardContract is ReentrancyGuard {
             bool isRedeem,
             address recipient,
             string memory mail,
-            address token
+            address token,
+            GiftCardStatus status
         )
     {
         GiftCardStruct memory card = _giftCard[cardId];
@@ -257,7 +314,8 @@ contract GiftCardContract is ReentrancyGuard {
             card.isRedeem,
             card.recipient,
             card.mail,
-            card.token
+            card.token,
+            card.status
         );
     }
 }

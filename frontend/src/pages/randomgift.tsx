@@ -1,6 +1,4 @@
 import React from 'react'
-import Navbar from '@/components/Navbar'
-// import GiftCardCreator from '@/components/GiftCardCreator'
 import RandomGift from '@/components/RandomGift'
 
 
@@ -11,7 +9,7 @@ const creategift = () => {
   };
   return (
     <div>
-        <Navbar />
+        {/* <Navbar /> */}
         <div className='section'>
         <RandomGift onChange={handleArrayChange} />
         </div>

@@ -7,10 +7,9 @@ import { GiftCardClaimForm } from "@/components/GiftCardClaimForm";
 
 import { Card } from "@/components/ui/card";
 import { BadgeCheck, Gift } from "lucide-react";
-import { useReadContract, useAccount } from "wagmi";
+import { useReadContract } from "wagmi";
 import GiftAbi from "@/contract/GiftAbi.json";
-import FactoryAbi from "@/contract/Factory.json";
-import { Factory } from "@/constant";
+import {  GiftContractAddress } from "@/constant";
 import { shortenAddress } from "@/utils";
 
 interface GiftCardDetails {
@@ -25,21 +24,15 @@ const ClaimGiftCard = () => {
   const params = useParams();
   const id = params?.id as string;
   const navigate = useRouter();
-  const { address } = useAccount();
+  // const { address } = useAccount();
   const [gitDetails, setGitDetails] = useState<GiftCardDetails | null>(null)
   // const { id } = navigate.query 
   // const [giftCard, setGiftCard] = useState<any>(null);
 
-  const { data: userCreatedAddres } = useReadContract({
-    abi: FactoryAbi,
-    address: Factory,
-    functionName: "GiftCardDeploy",
-    args: [address],
-  })
 
   const { data: getGifCardDetails } = useReadContract({
     abi: GiftAbi,
-    address: userCreatedAddres as `0x${string}`,
+    address: GiftContractAddress,
     functionName: "getGiftCardDetails",
     args: [id]
   }) as { data: [bigint, string, boolean, string, string, string] };
@@ -127,7 +120,7 @@ const ClaimGiftCard = () => {
           {gitDetails ? (
           <div className="grid md:grid-cols-2 gap-8">
             <div className="order-2 md:order-1">
-              <GiftCardClaimForm userCreatedAddres={userCreatedAddres as `0x${string}`} giftCard={gitDetails} cardId={id}/>
+              <GiftCardClaimForm giftCard={gitDetails} cardId={id}/>
             </div>
 
             <div className="order-1 md:order-2 flex justify-center">

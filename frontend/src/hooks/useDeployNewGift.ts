@@ -7,14 +7,14 @@ import { getEthersSigner } from "@/config/adapter"
 import { useAccount, useChainId, useConfig } from "wagmi";
 import { toast } from 'sonner';
 // import { Factory } from "@/constant";
+import { GiftContractAddress } from "@/constant";
 interface Params {
-    userContractAddress: string;
     recipient: string;
     amount: number;
     tokenAddress: string;
     mail: string
 }
-const useDeployNewGift = ({ userContractAddress, recipient, amount, tokenAddress, mail }: Params) => {
+const useDeployNewGift = ({ recipient, amount, tokenAddress, mail }: Params) => {
     const [isLoading, setIsLoading] = useState(false)
     const [cardIdE, setCardIdE] = useState('')
     const { address } = useAccount();
@@ -32,19 +32,19 @@ const useDeployNewGift = ({ userContractAddress, recipient, amount, tokenAddress
         const signer = await getEthersSigner(wagmiConfig);
 
 
-        const factoryContract = new Contract(userContractAddress, GiftAbi, signer);
+        const factoryContract = new Contract(GiftContractAddress, GiftAbi, signer);
 
         try {
             const tx = await factoryContract.createGiftcard(recipient, amount, tokenAddress, mail);
-            const receipt = await tx.wait();
+            const receipt = await tx.wait(1);
             if (receipt.status === 0) {
                 throw new Error("Transation failed");
             }
             /* eslint-disable @typescript-eslint/no-explicit-any */
-            const event = receipt.logs.find((log: any) => 
-                log.address.toLowerCase() === userContractAddress.toLowerCase()
+            const event = receipt.logs.find((log: any) =>
+                log.address.toLowerCase() === GiftContractAddress.toLowerCase()
             );
-        
+
             if (event) {
                 const parsedLog = factoryContract.interface.parseLog(event);
                 console.log("GiftCardCreated Event Data:", parsedLog?.args);
@@ -59,13 +59,13 @@ const useDeployNewGift = ({ userContractAddress, recipient, amount, tokenAddress
             toast.success("Gift card successfully created");
             return receipt
         } catch (error) {
-            console.log(error)
+            console.log(error, "err")
             toast.error("Unable to create giftcard")
         } finally {
             setIsLoading(false)
         }
 
-    }, [address, wagmiConfig, chainId,recipient, amount, tokenAddress, mail, userContractAddress]);
+    }, [address, wagmiConfig, chainId, recipient, amount, tokenAddress, mail]);
     return {
         handleCreateContract, isLoading, cardIdE
     }

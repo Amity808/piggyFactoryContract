@@ -18,15 +18,15 @@ async function main() {
 
     // const token2 = await mockToken2.getAddress();
 
-    const PiggyFactory = await hre.ethers.getContractFactory("CryptFactory");
+    const PiggyFactory = await hre.ethers.getContractFactory("GiftCardContract");
+    const USDC = "0x19EeaDcBA1801Afec43e87Cefcd4239E13fc294d"
+    const owner = "0x8822F2965090Ddc102F7de354dfd6E642C090269"
 
-    
-
-    const piggyFactory = await PiggyFactory.deploy();
+    const piggyFactory = await PiggyFactory.deploy(USDC, owner);
 
     await piggyFactory.waitForDeployment();
 
-    console.log("PiggyFactory deployed to:", await piggyFactory.getAddress());
+    console.log("GiftCardContract deployed to:", await piggyFactory.getAddress());
   
 }
 

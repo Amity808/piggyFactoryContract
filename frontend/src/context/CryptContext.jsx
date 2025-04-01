@@ -1,7 +1,7 @@
 import React, { useContext, createContext, useState } from "react";
 import { ethers } from "ethers";
 import FactoryAbi from "@/contract/Factory.json"
-import { Factory } from "@/constant/index";
+import { Factory, GiftContractAddress } from "@/constant/index";
 import { useReadContract, useWriteContract, useAccount } from "wagmi";
 
 
@@ -10,7 +10,6 @@ const CryptContext = createContext(null);
 // : { children: React.ReactNode}
 
 export const AppProvider = ({ children }) => {
-    const [userAddress, setUserAddress] = useState('')
     const { address } = useAccount()
 
     const { data: GiftCardDeployLen } = useReadContract({
@@ -33,13 +32,11 @@ export const AppProvider = ({ children }) => {
     })
     
 
-    console.log(userAddress, "userCreatedAddress")
-
 
 
     
     return (
-        <CryptContext.Provider value={{userCreatedAddress, userAddress}}>
+        <CryptContext.Provider value={{userCreatedAddress}}>
             {children}
         </CryptContext.Provider>
     )

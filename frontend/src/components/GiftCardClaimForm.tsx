@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useSimulateContract, useWriteContract } from "wagmi";
 import GiftAbi from "@/contract/GiftAbi.json";
 import { toast } from "sonner";
+import { GiftContractAddress } from "@/constant";
 
 interface GiftCardDetails {
   poolBalance: bigint;
@@ -17,11 +18,11 @@ interface GiftCardDetails {
 }
 interface GiftCardClaimFormProps {
   giftCard: GiftCardDetails;
-  userCreatedAddres: `0x${string}` | undefined;
+  
   cardId: string;
 }
 
-export function GiftCardClaimForm({ giftCard, userCreatedAddres, cardId }: GiftCardClaimFormProps) {
+export function GiftCardClaimForm({ giftCard, cardId }: GiftCardClaimFormProps) {
   // const [walletAddress, setWalletAddress] = useState("");
   // const [isValid, setIsValid] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,7 +39,7 @@ export function GiftCardClaimForm({ giftCard, userCreatedAddres, cardId }: GiftC
   const { writeContractAsync } = useWriteContract()
   const { data: simulate } = useSimulateContract({
     abi: GiftAbi,
-    address: userCreatedAddres as `0x${string}`,
+    address: GiftContractAddress,
     functionName: "redeemGiftCard",
     args: [cardId],
   })
