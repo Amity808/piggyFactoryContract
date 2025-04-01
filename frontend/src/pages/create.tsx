@@ -10,9 +10,7 @@ const creategift = () => {
         <Navbar />
         
         <GiftCardCreator />
-        <div>
-   
-        </div>
+        
         
     </div>
   )

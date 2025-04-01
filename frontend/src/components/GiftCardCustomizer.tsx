@@ -136,20 +136,19 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
         const result = await handleCreateContract();
         if(cardIdE) {
           const baseURL = `http://localhost:3000/claim/${cardIdE}`;
-          await sendEmail({link: baseURL, recipentName: recipientName, address: address, email: mailAddress, subjectLine: message})
-
+          const res = await sendEmail({link: baseURL, recipentName: recipientName, address: address, email: mailAddress, subjectLine: message})
+          console.log(res)
         }
         console.log(result, 'result')
       } else {
         await writeContractAsync(simulateApproval!.request);
         const result = await handleCreateContract();
 
-
-
         if(cardIdE) {
           const baseURL = `http://localhost:3000/claim/${cardIdE}`;
-           await sendEmail({link: baseURL, recipentName: "CrytaFath", address: address, email: mailAddress, subjectLine: message})
-
+           const res = await sendEmail({link: baseURL, recipentName: recipientName, address: address, email: mailAddress, subjectLine: message})
+          console.log(res, 'res');
+          
         }
 
         console.log(result, 'result')
