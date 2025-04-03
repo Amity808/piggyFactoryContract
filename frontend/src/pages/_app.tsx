@@ -9,6 +9,7 @@ import { config } from "@/config/wgami"
 import { AppProvider } from "@/context/CryptContext";
 
 
+
 let queryClient: QueryClient | undefined;
 
 const getQueryClient = () => {
@@ -19,7 +20,9 @@ const getQueryClient = () => {
   return queryClient;
 };
 export default function App({ Component, pageProps }: AppProps) {
+
   useEffect(() => {
+  
     // Add scroll observer for animations
     const observer = new IntersectionObserver(
       (entries) => {

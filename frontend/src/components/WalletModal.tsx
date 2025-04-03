@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 
 import { ShieldAlert, ShieldCheck } from "lucide-react";
 import { useConnectors, useAccount } from "wagmi";
-
+import { useSwitchChain } from 'wagmi'
+import { eduChainTestnet  } from "wagmi/chains";
 import { toast } from "sonner";
 
 
@@ -23,8 +24,10 @@ interface WalletModalProps {
 }
 
 const WalletModal = ({ open, onOpenChange }: WalletModalProps) => {
-    
+
     const [pendingConnectorUID, setPendingConnectorUID] = useState(null);
+
+    const { switchChain } = useSwitchChain()
 
     const connectors = useConnectors();
 
@@ -41,11 +44,14 @@ const WalletModal = ({ open, onOpenChange }: WalletModalProps) => {
 
     console.log(address)
 
-    /* eslint-disable @typescript-eslint/no-explicit-any */ 
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     const handleConnectWallet = async (connector: any) => {
         try {
             setPendingConnectorUID(connector?.id);
             await connector.connect();
+            if(eduChainTestnet) {
+                await switchChain({ chainId: eduChainTestnet.id});
+            }
         } catch (error) {
             if (error instanceof Error && error.name === 'UserRejectedRequestError') {
                 // Handle user rejection specifically

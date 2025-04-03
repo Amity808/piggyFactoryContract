@@ -14,3 +14,5 @@ export const config = createConfig({
         [eduChainTestnet.id]: http(),
     },
 });
+
+

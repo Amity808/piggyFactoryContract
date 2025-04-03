@@ -1,8 +1,8 @@
-import React, { useContext, createContext, useState } from "react";
-import { ethers } from "ethers";
+import React, { useContext, createContext } from "react";
+// import { ethers } from "ethers";
 import FactoryAbi from "@/contract/Factory.json"
-import { Factory, GiftContractAddress } from "@/constant/index";
-import { useReadContract, useWriteContract, useAccount } from "wagmi";
+import { Factory } from "@/constant/index";
+import { useReadContract, useAccount } from "wagmi";
 
 
 const CryptContext = createContext(null);
@@ -34,7 +34,7 @@ export const AppProvider = ({ children }) => {
 
 
 
-    
+
     return (
         <CryptContext.Provider value={{userCreatedAddress}}>
             {children}
