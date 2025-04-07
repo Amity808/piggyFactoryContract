@@ -130,9 +130,6 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
     });
   };
 
-
-  // const baseURL = `http://localhost:3000/claim/${cardIdE}`;
-
   const generateWithAi = async () => {
 
     try {
@@ -140,7 +137,6 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
         model: "gemini-2.0-flash",
         contents: `Generate a short message based on this prompt ${message}`
       })
-      console.log(reponse, 'response')
       setMessage(reponse?.text ?? "");
       /* eslint-disable @typescript-eslint/no-unused-vars */
     } catch (error) {
