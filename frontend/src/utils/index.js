@@ -31,7 +31,7 @@ export const isSupportedNetwork = (chainId) => {
 
 
 export const sendEmail = async ({link, recipentName, address, email, subjectLine}) => {
-    const emailHtml = render(<SendGiftMail userFirstname={recipentName} address={address} link={link} />);
+    const emailHtml = render(<SendGiftMail userFirstname={recipentName} address={address} link={link} content={subjectLine} />);
 
     console.log("Generated email HTML:", emailHtml);
     try {

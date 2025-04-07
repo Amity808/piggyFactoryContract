@@ -11,6 +11,9 @@ import useDeployNewGift from '@/hooks/useDeployNewGift';
 import { ErrorDecoder } from 'ethers-decode-error'
 import type { DecodedError } from 'ethers-decode-error'
 import { sendEmail } from "@/utils/index"
+import { GoogleGenAI } from "@google/genai";
+import { debounce } from 'lodash';
+
 
 
 // import SendGiftMail from '@/email/Welcome';
@@ -18,6 +21,7 @@ import { sendEmail } from "@/utils/index"
 
 const errorDecoder = ErrorDecoder.create()
 
+const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
 
 
 interface GiftCardCustomizerProps {
@@ -37,7 +41,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
   const [recipientName, setRecipientName] = useState('')
   const [amount, setAmount] = useState(1);
   const [currency, setCurrency] = useState('ETH');
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState<string>('');
   const [mailAddress, setMailAddress] = useState('')
   const [theme, setTheme] = useState<'blue' | 'purple' | 'green' | 'gold'>('blue');
   const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
@@ -45,9 +49,17 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
 
 
 
+  const handleClear = () => {
+    setRecipient('');
+    setAmount(0);
+    setCurrency('ETH');
+    setMessage('');
+    setMailAddress('')
+    setRecipientName('')
+
+  }
+
   const { address } = useAccount();
-
-
 
   const { data: userReadAllowance } = useReadContract({
     abi: tokenAbi,
@@ -77,6 +89,10 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
     { id: 'USDT', name: 'USDT', min: 10, max: 1000 },
   ];
 
+  const debouncedUpdate = debounce((data) => {
+    onUpdate(data);
+  }, 300);
+
   const handleInputChange = (field: string, value: string | number) => {
     switch (field) {
       case 'recipient':
@@ -103,7 +119,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
         break;
     }
 
-    onUpdate({
+    debouncedUpdate({
       recipient: field === 'recipient' ? value as string : recipient,
       amount: field === 'amount' ? Number(value) : amount,
       currency: field === 'currency' ? value as string : currency,
@@ -116,6 +132,21 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
 
 
   // const baseURL = `http://localhost:3000/claim/${cardIdE}`;
+
+  const generateWithAi = async () => {
+
+    try {
+      const reponse = await ai.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: `Generate a short message based on this prompt ${message}`
+      })
+      console.log(reponse, 'response')
+      setMessage(reponse?.text ?? "");
+      /* eslint-disable @typescript-eslint/no-unused-vars */
+    } catch (error) {
+
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -134,9 +165,9 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
 
       if (Number(userReadAllowance) >= ethers.parseEther(amount.toString())) {
         const result = await handleCreateContract();
-        if(cardIdE) {
+        if (cardIdE) {
           const baseURL = `http://localhost:3000/claim/${cardIdE}`;
-          const res = await sendEmail({link: baseURL, recipentName: recipientName, address: address, email: mailAddress, subjectLine: message})
+          const res = await sendEmail({ link: baseURL, recipentName: recipientName, address: address, email: mailAddress, subjectLine: message })
           console.log(res)
         }
         console.log(result, 'result')
@@ -144,11 +175,11 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
         await writeContractAsync(simulateApproval!.request);
         const result = await handleCreateContract();
 
-        if(cardIdE) {
+        if (cardIdE) {
           const baseURL = `http://localhost:3000/claim/${cardIdE}`;
-           const res = await sendEmail({link: baseURL, recipentName: recipientName, address: address, email: mailAddress, subjectLine: message})
+          const res = await sendEmail({ link: baseURL, recipentName: recipientName, address: address, email: mailAddress, subjectLine: message })
           console.log(res, 'res');
-          
+
         }
 
         console.log(result, 'result')
@@ -156,6 +187,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
 
 
       // console.log(result);
+      handleClear();
 
     } catch (error) {
       console.error("Gift card creation failed:", error);
@@ -306,10 +338,13 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
             onChange={(e) => handleInputChange('message', e.target.value)}
             rows={3}
             className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-crypto-blue focus:ring-crypto-blue input-focus-ring py-2 border"
-            placeholder="Add a personal message..."
+            placeholder="Add a personal message... or use AI"
             maxLength={100}
           />
           <p className="text-xs text-right text-crypto-gray">{message.length}/100</p>
+        </div>
+        <div>
+          <Button onClick={generateWithAi}>Generate With AI </Button>
         </div>
 
         <div className="space-y-2">
