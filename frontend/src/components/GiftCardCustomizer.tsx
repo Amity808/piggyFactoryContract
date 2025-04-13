@@ -49,15 +49,15 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
 
 
 
-  const handleClear = () => {
-    setRecipient('');
-    setAmount(0);
-    setCurrency('ETH');
-    setMessage('');
-    setMailAddress('')
-    setRecipientName('')
+  // const handleClear = () => {
+  //   setRecipient('');
+  //   setAmount(0);
+  //   setCurrency('ETH');
+  //   setMessage('');
+  //   setMailAddress('')
+  //   setRecipientName('')
 
-  }
+  // }
 
   const { address } = useAccount();
 

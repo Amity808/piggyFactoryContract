@@ -6,7 +6,7 @@ import GiftAbi from "@/contract/GiftAbi.json";
 import { Contract, ethers } from "ethers";
 import { getEthersSigner } from "@/config/adapter";
 import { isSupportedNetwork } from "@/utils";
-import { parseEther } from "ethers";
+
 
 interface TransferRandomParams {
     recipients: `0x${string}`[];
