@@ -168,7 +168,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
           const res = await sendEmail({ link: baseURL, recipentName: recipientName, address: address, email: mailAddress, subjectLine: message })
           console.log(res, "email")
         }
-        console.log(result, 'result')
+        // console.log(result, 'result')
       } else {
         await writeContractAsync(simulateApproval!.request);
         const result = await handleCreateContract();
@@ -180,7 +180,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
 
         }
 
-        console.log(result, 'result')
+        // console.log(result, 'result')
       }
 
 
