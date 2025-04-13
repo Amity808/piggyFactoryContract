@@ -69,8 +69,10 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
 
   })
 
+  const amountGwi = ethers.parseUnits(amount.toString(), 6)
+
   const { handleCreateContract, cardIdE } = useDeployNewGift({
-    recipient, amount, tokenAddress: USDC, mail: mailAddress
+    recipient, amount: amountGwi.toString(), tokenAddress: USDC, mail: mailAddress
   })
   const { writeContractAsync } = useWriteContract()
 
@@ -162,7 +164,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
       if (Number(userReadAllowance) >= ethers.parseEther(amount.toString())) {
         const result = await handleCreateContract();
         if (cardIdE) {
-          const baseURL = `http://localhost:3000/claim/${cardIdE}`;
+          const baseURL = `${process.env.NEXT_PUBLIC_BASE_URL}/claim/${cardIdE}`;
           const res = await sendEmail({ link: baseURL, recipentName: recipientName, address: address, email: mailAddress, subjectLine: message })
           console.log(res)
         }
@@ -172,7 +174,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
         const result = await handleCreateContract();
 
         if (cardIdE) {
-          const baseURL = `http://localhost:3000/claim/${cardIdE}`;
+          const baseURL = `${process.env.NEXT_PUBLIC_BASE_URL}/claim/${cardIdE}`;
           const res = await sendEmail({ link: baseURL, recipentName: recipientName, address: address, email: mailAddress, subjectLine: message })
           console.log(res, 'res');
 
@@ -183,7 +185,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
 
 
       // console.log(result);
-      handleClear();
+      // handleClear();
 
     } catch (error) {
       console.error("Gift card creation failed:", error);

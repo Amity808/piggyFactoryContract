@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { GiftContractAddress } from "@/constant";
 interface Params {
     recipient: string;
-    amount: number;
+    amount: string;
     tokenAddress: string;
     mail: string
 }

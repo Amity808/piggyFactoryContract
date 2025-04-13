@@ -6,6 +6,7 @@ import GiftAbi from "@/contract/GiftAbi.json";
 import { Contract, ethers } from "ethers";
 import { getEthersSigner } from "@/config/adapter";
 import { isSupportedNetwork } from "@/utils";
+import { parseEther } from "ethers";
 
 interface TransferRandomParams {
     recipients: `0x${string}`[];
@@ -47,7 +48,7 @@ const useTransferRandom = () => {
             const signer = await getEthersSigner(wagmiConfig);
             const giftCardContract = new Contract(GiftContractAddress, GiftAbi, signer);
 
-            const amountInWei = ethers.parseUnits(amount, 18);
+            const amountInWei = ethers.parseUnits(amount.toString(), 6);
 
             const tx = await giftCardContract.transferRandom(
                 recipients,
