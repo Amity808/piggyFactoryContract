@@ -21,7 +21,9 @@ import { debounce } from 'lodash';
 
 const errorDecoder = ErrorDecoder.create()
 
-const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
+const ai = process.env.NEXT_PUBLIC_GEMINI_API_KEY
+  ? new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY })
+  : null;
 
 
 interface GiftCardCustomizerProps {
@@ -133,6 +135,14 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
   };
 
   const generateWithAi = async () => {
+    if (!ai) {
+      toast({
+        title: "AI Service Unavailable",
+        description: "The AI feature is currently disabled.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       const reponse = await ai.models.generateContent({
@@ -144,7 +154,7 @@ const GiftCardCustomizer = ({ onUpdate }: GiftCardCustomizerProps) => {
     } catch (error) {
 
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
